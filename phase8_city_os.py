@@ -789,8 +789,9 @@ with tab3:
                         cv2.putText(display, "GRIDLOCK DETECTED", (10, 90),
                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-                    # Display frame
-                    frame_rgb = cv2.cvtColor(display, cv2.COLOR_BGR2RGB)
+                    # Display frame (resized to prevent websocket dropping on cloud)
+                    display_small = cv2.resize(display, (600, 450))
+                    frame_rgb = cv2.cvtColor(display_small, cv2.COLOR_BGR2RGB)
                     frame_placeholder.image(frame_rgb, channels="RGB", use_container_width=True)
 
                     # Update density gauge
@@ -842,7 +843,7 @@ with tab3:
                         </div>
                         """, unsafe_allow_html=True)
 
-                    time.sleep(0.15)  # ~6 FPS display rate to prevent cloud websocket overload
+                    time.sleep(0.2)  # ~5 FPS display rate to prevent cloud websocket overload
 
                 cap.release()
     else:
