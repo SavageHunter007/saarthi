@@ -895,6 +895,10 @@ with tab3:
     # ══════════════════════════════════════════════════════════════════════
     # SECTION 2: CAMERA NETWORK + EDGE ANALYTICS
     # ══════════════════════════════════════════════════════════════════════
+    # Session state for monitoring toggle
+    if "cam07_active" not in st.session_state:
+        st.session_state["cam07_active"] = False
+
     col_cams, col_analytics = st.columns([55, 45])
 
     with col_cams:
@@ -939,18 +943,21 @@ with tab3:
         if os.path.exists(VIDEO_PATH):
             start_btn = st.button("▶ START AUTONOMOUS MONITORING — CAM-07", type="primary", use_container_width=True)
             if start_btn:
+                st.session_state["cam07_active"] = True
+            if st.session_state["cam07_active"]:
                 if not os.path.exists(ANNOTATED_VIDEO_PATH):
                     st.error("Pre-rendered annotated video not found.")
                 else:
-                    pb = st.progress(0, text="⏳ Edge-AI: connecting to CAM-07...")
-                    time.sleep(0.4)
-                    pb.progress(0.3, text="⏳ MOG2 background subtraction initialised...")
-                    time.sleep(0.8)
-                    pb.progress(0.6, text="⏳ Contour detection + vehicle classification...")
-                    time.sleep(0.8)
-                    pb.progress(0.9, text="⏳ Density model calibrating against corridor capacity...")
-                    time.sleep(0.6)
-                    pb.progress(1.0, text="✅ GRIDLOCK CONFIRMED — Cascade predictor activated")
+                    if start_btn:  # only show progress on first click
+                        pb = st.progress(0, text="⏳ Edge-AI: connecting to CAM-07...")
+                        time.sleep(0.4)
+                        pb.progress(0.3, text="⏳ MOG2 background subtraction initialised...")
+                        time.sleep(0.8)
+                        pb.progress(0.6, text="⏳ Contour detection + vehicle classification...")
+                        time.sleep(0.8)
+                        pb.progress(0.9, text="⏳ Density model calibrating against corridor capacity...")
+                        time.sleep(0.6)
+                        pb.progress(1.0, text="✅ GRIDLOCK CONFIRMED — Cascade predictor activated")
                     with open(ANNOTATED_VIDEO_PATH, "rb") as vf:
                         st.video(vf.read())
         else:
@@ -959,7 +966,9 @@ with tab3:
     with col_analytics:
         st.markdown('<div class="sec-h">EDGE COMPUTING + REAL-TIME ANALYTICS</div>', unsafe_allow_html=True)
 
-        # Edge Device Card
+        active = st.session_state.get("cam07_active", False)
+
+        # Edge Device Card — always visible
         st.markdown("""
         <div class="edge-card">
           <div class="edge-title">⚙️ EDGE DEVICE — NVIDIA JETSON NANO 4GB</div>
@@ -974,36 +983,66 @@ with tab3:
         </div>
         """, unsafe_allow_html=True)
 
-        # Vehicle Classification
-        st.markdown("""
-        <div class="edge-card">
-          <div class="edge-title">🚗 VEHICLE CLASSIFICATION BREAKDOWN — CAM-07 PEAK</div>
-          <div class="veh-grid">
-            <div class="veh-item"><div class="veh-icon">🚗</div><div class="veh-count">21</div><div class="veh-lbl">Cars</div></div>
-            <div class="veh-item"><div class="veh-icon">🚌</div><div class="veh-count">3</div><div class="veh-lbl">Buses</div></div>
-            <div class="veh-item"><div class="veh-icon">🛻</div><div class="veh-count">2</div><div class="veh-lbl">Trucks</div></div>
-            <div class="veh-item"><div class="veh-icon">🏍️</div><div class="veh-count">9</div><div class="veh-lbl">Two-wheelers</div></div>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Vehicle Classification — changes on active
+        if active:
+            st.markdown("""
+            <div class="edge-card">
+              <div class="edge-title">🚗 VEHICLE CLASSIFICATION — CAM-07 PEAK DETECTED</div>
+              <div class="veh-grid">
+                <div class="veh-item"><div class="veh-icon">🚗</div><div class="veh-count">21</div><div class="veh-lbl">Cars</div></div>
+                <div class="veh-item"><div class="veh-icon">🚌</div><div class="veh-count">3</div><div class="veh-lbl">Buses</div></div>
+                <div class="veh-item"><div class="veh-icon">🛻</div><div class="veh-count">2</div><div class="veh-lbl">Trucks</div></div>
+                <div class="veh-item"><div class="veh-icon">🏍️</div><div class="veh-count">9</div><div class="veh-lbl">Two-wheelers</div></div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="edge-card">
+              <div class="edge-title">🚗 VEHICLE CLASSIFICATION — STANDBY</div>
+              <div class="veh-grid">
+                <div class="veh-item"><div class="veh-icon">🚗</div><div class="veh-count" style="color:#64748b;">—</div><div class="veh-lbl">Cars</div></div>
+                <div class="veh-item"><div class="veh-icon">🚌</div><div class="veh-count" style="color:#64748b;">—</div><div class="veh-lbl">Buses</div></div>
+                <div class="veh-item"><div class="veh-icon">🛻</div><div class="veh-count" style="color:#64748b;">—</div><div class="veh-lbl">Trucks</div></div>
+                <div class="veh-item"><div class="veh-icon">🏍️</div><div class="veh-count" style="color:#64748b;">—</div><div class="veh-lbl">Two-wheelers</div></div>
+              </div>
+              <div style="font-size:10px;color:#475569;text-align:center;margin-top:8px;">Press START to begin detection</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        # Density gauge
-        st.markdown("""
-        <div class="edge-card">
-          <div class="edge-title">📊 TRAFFIC DENSITY — CAM-07</div>
-          <div style="text-align:center; padding: 6px 0;">
-            <div style="font-size:44px;font-weight:800;color:#ef4444;font-family:'JetBrains Mono',monospace;line-height:1;">88%</div>
-            <div style="font-size:11px;color:#f87171;margin-top:4px;">GRIDLOCK — Autonomous trigger fired at T+9.2s</div>
-          </div>
-          <div class="thresh-wrap">
-            <div class="thresh-lbl"><span>0%</span><span style="color:#22c55e;">NORMAL</span><span style="color:#f59e0b;">AMBER</span><span style="color:#ef4444;">RED</span><span>100%</span></div>
-            <div class="thresh-bar"><div class="thresh-marker" style="left:88%;"></div></div>
-            <div class="thresh-lbl"><span></span><span style="color:#22c55e;">60%</span><span></span><span style="color:#ef4444;">85%</span><span></span></div>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Density gauge — animates from 17% → 88%
+        if active:
+            st.markdown("""
+            <div class="edge-card">
+              <div class="edge-title">📊 TRAFFIC DENSITY — CAM-07 · LIVE</div>
+              <div style="text-align:center; padding: 6px 0;">
+                <div style="font-size:44px;font-weight:800;color:#ef4444;font-family:'JetBrains Mono',monospace;line-height:1;">88%</div>
+                <div style="font-size:11px;color:#f87171;margin-top:4px;">🔴 GRIDLOCK — Autonomous trigger fired at T+9.2s</div>
+              </div>
+              <div class="thresh-wrap">
+                <div class="thresh-lbl"><span>0%</span><span style="color:#22c55e;">NORMAL</span><span style="color:#f59e0b;">AMBER</span><span style="color:#ef4444;">RED</span><span>100%</span></div>
+                <div class="thresh-bar"><div class="thresh-marker" style="left:88%;"></div></div>
+                <div class="thresh-lbl"><span></span><span style="color:#22c55e;">60%</span><span></span><span style="color:#ef4444;">85%</span><span></span></div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="edge-card">
+              <div class="edge-title">📊 TRAFFIC DENSITY — CAM-07 · STANDBY</div>
+              <div style="text-align:center; padding: 6px 0;">
+                <div style="font-size:44px;font-weight:800;color:#22c55e;font-family:'JetBrains Mono',monospace;line-height:1;">17%</div>
+                <div style="font-size:11px;color:#4ade80;margin-top:4px;">🟢 NORMAL — Monitoring idle · Press START</div>
+              </div>
+              <div class="thresh-wrap">
+                <div class="thresh-lbl"><span>0%</span><span style="color:#22c55e;">NORMAL</span><span style="color:#f59e0b;">AMBER</span><span style="color:#ef4444;">RED</span><span>100%</span></div>
+                <div class="thresh-bar"><div class="thresh-marker" style="left:17%;"></div></div>
+                <div class="thresh-lbl"><span></span><span style="color:#22c55e;">60%</span><span></span><span style="color:#ef4444;">85%</span><span></span></div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        # Model performance
+        # Model performance — always visible
         st.markdown("""
         <div class="edge-card">
           <div class="edge-title">📈 MODEL PERFORMANCE METRICS</div>
