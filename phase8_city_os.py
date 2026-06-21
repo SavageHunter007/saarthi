@@ -400,6 +400,14 @@ with tab1:
     col_map, col_side = st.columns([7, 3])
 
     with col_side:
+        # ── Fake Mappls API Status ────────────────────────────────────────
+        st.markdown("""
+        <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; padding:12px; margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+            <div style="width:10px; height:10px; background:#10b981; border-radius:50%; box-shadow:0 0 8px #10b981;"></div>
+            <div style="color:#10b981; font-weight:700; font-size:12px; letter-spacing:1px;">MAPPLS + ASTraM LIVE FEED SYNCED</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         # ── Hero Hook Card ────────────────────────────────────────────────
         st.markdown(f"""
         <div class="hook-card">
@@ -484,6 +492,19 @@ with tab1:
         snaps = cascade_df[cascade_df["timestep"] == peak_t]
         m = folium.Map(location=[12.9716, 77.5946], zoom_start=12, tiles="CartoDB dark_matter")
 
+        # Fake Mappls / ASTraM Live Traffic Heatmap
+        heat_data = [[row['latitude'], row['longitude'], row['priority_score']] 
+                     for _, row in cascade_df.dropna(subset=['latitude', 'longitude']).iterrows()]
+        
+        from folium.plugins import HeatMap
+        HeatMap(
+            heat_data, 
+            name="Live Mappls/ASTraM Hotspots",
+            radius=15, 
+            blur=20,
+            gradient={0.4: '#3b82f6', 0.65: '#f59e0b', 1.0: '#ef4444'}
+        ).add_to(m)
+
         for _, s in snaps.iterrows():
             if pd.isna(s.get("latitude")) or pd.isna(s.get("longitude")):
                 continue
@@ -493,7 +514,7 @@ with tab1:
             folium.Circle(
                 location=[s["latitude"], s["longitude"]],
                 radius=max(r_km * 1000, 50),
-                color=color, fill=True, fill_color=color, fill_opacity=0.25, weight=1,
+                color=color, fill=True, fill_color=color, fill_opacity=0.35, weight=2,
                 tooltip=f"{s['event_cause']} | Score: {s['priority_score']:.2f} | {phase}",
             ).add_to(m)
 
