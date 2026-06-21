@@ -758,7 +758,9 @@ with tab3:
                     progress_bar.progress(1.0, text="✅ Analysis complete — playing annotated feed")
 
                     # ── Play annotated video using native HTML5 player ─────
-                    st.video(ANNOTATED_VIDEO_PATH)
+                    with open(ANNOTATED_VIDEO_PATH, "rb") as video_file:
+                        video_bytes = video_file.read()
+                    st.video(video_bytes)
 
             if os.path.exists(ANNOTATED_VIDEO_PATH):
                 # ── Show results on right panel ───────────────────────
