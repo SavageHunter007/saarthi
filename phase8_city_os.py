@@ -896,8 +896,11 @@ with tab3:
     # SECTION 2: CAMERA NETWORK + EDGE ANALYTICS
     # ══════════════════════════════════════════════════════════════════════
     # Session state for monitoring toggle
+    # Session state for monitoring toggle
     if "cam07_active" not in st.session_state:
         st.session_state["cam07_active"] = False
+    if "cam07_done" not in st.session_state:
+        st.session_state["cam07_done"] = False
 
     col_cams, col_analytics = st.columns([55, 45])
 
@@ -905,7 +908,7 @@ with tab3:
         st.markdown('<div class="sec-h">CAMERA NETWORK — BENGALURU SOUTH CORRIDOR</div>', unsafe_allow_html=True)
 
         # Camera status grid -- state-aware
-        _a = st.session_state.get('cam07_active', False)
+        _a = st.session_state.get('cam07_done', False)
         if _a:
             _c07 = ('cam-red',   '🔴 GRIDLOCK',   'red',
                     'Density: <strong style="color:#f87171">88%</strong> &middot; 35 vehicles &middot; Trigger FIRED',
@@ -956,14 +959,13 @@ with tab3:
         st.markdown('<div class="sec-h" style="margin-top:14px;">CAM-07 · ANNOTATED LIVE FEED</div>', unsafe_allow_html=True)
 
         if os.path.exists(VIDEO_PATH):
-            start_btn = st.button("▶ START AUTONOMOUS MONITORING — CAM-07", type="primary", use_container_width=True)
-            if start_btn:
-                st.session_state["cam07_active"] = True
-            if st.session_state["cam07_active"]:
-                if not os.path.exists(ANNOTATED_VIDEO_PATH):
-                    st.error("Pre-rendered annotated video not found.")
-                else:
-                    if start_btn:  # only show progress on first click
+            if not st.session_state["cam07_done"]:
+                start_btn = st.button("▶ START AUTONOMOUS MONITORING — CAM-07", type="primary", use_container_width=True)
+                if start_btn:
+                    st.session_state["cam07_active"] = True
+                    if not os.path.exists(ANNOTATED_VIDEO_PATH):
+                        st.error("Pre-rendered annotated video not found.")
+                    else:
                         pb = st.progress(0, text="⏳ Edge-AI: connecting to CAM-07...")
                         time.sleep(0.4)
                         pb.progress(0.3, text="⏳ MOG2 background subtraction initialised...")
@@ -973,6 +975,12 @@ with tab3:
                         pb.progress(0.9, text="⏳ Density model calibrating against corridor capacity...")
                         time.sleep(0.6)
                         pb.progress(1.0, text="✅ GRIDLOCK CONFIRMED — Cascade predictor activated")
+                        time.sleep(0.5)
+                        st.session_state["cam07_done"] = True
+                        st.rerun()
+            else:
+                st.markdown('<div style="background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:10px; border-radius:6px; color:#4ade80; text-align:center; font-weight:bold; margin-bottom:12px;">✅ GRIDLOCK CONFIRMED — Cascade predictor activated</div>', unsafe_allow_html=True)
+                if os.path.exists(ANNOTATED_VIDEO_PATH):
                     with open(ANNOTATED_VIDEO_PATH, "rb") as vf:
                         st.video(vf.read())
         else:
@@ -981,7 +989,7 @@ with tab3:
     with col_analytics:
         st.markdown('<div class="sec-h">EDGE COMPUTING + REAL-TIME ANALYTICS</div>', unsafe_allow_html=True)
 
-        active = st.session_state.get("cam07_active", False)
+        active = st.session_state.get("cam07_done", False)
 
         # Edge Device Card — always visible
         st.markdown("""
@@ -1218,7 +1226,6 @@ with tab3:
     st.markdown("""
     <div style="background:linear-gradient(135deg,#070d1a,#0a1224);border:1px solid #1e3a5f;border-radius:12px;padding:24px 28px;margin-bottom:16px;">
       <div class="tl-wrap">
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot blue"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1227,7 +1234,6 @@ with tab3:
             <div class="tl-sub">MOG2 background subtractor initialised · 800×600 · 20 FPS pipeline active</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot blue"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1236,7 +1242,6 @@ with tab3:
             <div class="tl-sub">Contour area filter: 300–12,000 px² · Aspect ratio: 0.2–5.0 · Precision 0.89</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot amber"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1245,7 +1250,6 @@ with tab3:
             <div class="tl-sub">Cascade predictor primed · upstream junctions placed on watch · alert level: ELEVATED</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1254,7 +1258,6 @@ with tab3:
             <div class="tl-sub">35 vehicles confirmed · Hosur Road Jn capacity exceeded · Entering gridlock state</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1263,7 +1266,6 @@ with tab3:
             <div class="tl-sub">Silk Board: 72% in ~8 min · BTM Layout: 65% in ~15 min · Madiwala: 55% in ~22 min</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1272,7 +1274,6 @@ with tab3:
             <div class="tl-sub">Survival Forest scored in real-time · congestion_impact=0.9 · corridor_crit=1.0 · duration_risk=0.8</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot red"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1281,7 +1282,6 @@ with tab3:
             <div class="tl-sub">Constraint-aware optimizer · priority_score / (travel_time + 1) maximised · 8 units managed</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot amber"></div><div class="tl-line"></div></div>
           <div class="tl-body">
@@ -1290,7 +1290,6 @@ with tab3:
             <div class="tl-sub">Estimated diversion capacity: 340+ vehicles/hour · upstream barricades armed at 2 junctions</div>
           </div>
         </div>
-
         <div class="tl-item">
           <div class="tl-left"><div class="tl-dot green"></div><div class="tl-line" style="background:transparent;"></div></div>
           <div class="tl-body">
@@ -1299,9 +1298,7 @@ with tab3:
             <div class="tl-sub">Multi-stakeholder coordination complete · BTP + Flipkart e-kart + citizen network</div>
           </div>
         </div>
-
       </div>
-
       <div class="tl-final">
         <div class="tl-final-text">⚡ DETECTION → FULL MULTI-AGENCY RESPONSE IN 1.4 SECONDS</div>
         <div class="tl-final-sub">Zero human intervention. Zero manual dispatch. Cascade intercepted 7 minutes early. Fully autonomous.</div>
