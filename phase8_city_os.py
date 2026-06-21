@@ -904,39 +904,54 @@ with tab3:
     with col_cams:
         st.markdown('<div class="sec-h">CAMERA NETWORK — BENGALURU SOUTH CORRIDOR</div>', unsafe_allow_html=True)
 
-        # Camera status grid
-        st.markdown("""
+        # Camera status grid -- state-aware
+        _a = st.session_state.get('cam07_active', False)
+        if _a:
+            _c07 = ('cam-red',   '🔴 GRIDLOCK',   'red',
+                    'Density: <strong style="color:#f87171">88%</strong> &middot; 35 vehicles &middot; Trigger FIRED',
+                    'width:88%;background:linear-gradient(90deg,#ef4444,#dc2626);')
+            _c12 = ('cam-amber', '🟡 MODERATE',   'amber',
+                    'Density: <strong style="color:#fbbf24">61%</strong> &middot; 22 vehicles &middot; CASCADE RISK',
+                    'width:61%;background:linear-gradient(90deg,#f59e0b,#d97706);')
+        else:
+            _c07 = ('cam-green', '🟢 MONITORING', 'green',
+                    'Density: <strong style="color:#4ade80">17%</strong> &middot; 6 vehicles &middot; Normal flow',
+                    'width:17%;background:linear-gradient(90deg,#22c55e,#16a34a);')
+            _c12 = ('cam-green', '🟢 MONITORING', 'green',
+                    'Density: <strong style="color:#4ade80">24%</strong> &middot; 8 vehicles &middot; Normal flow',
+                    'width:24%;background:linear-gradient(90deg,#22c55e,#16a34a);')
+        st.markdown(f'''
         <div class="cam-grid">
-          <div class="cam-card cam-red">
-            <div class="cam-id">CAM-07 · HOSUR RD JN</div>
+          <div class="cam-card {_c07[0]}">
+            <div class="cam-id">CAM-07 &middot; HOSUR RD JN</div>
             <div class="cam-loc">Hosur Road Junction</div>
-            <span class="cam-stat red">🔴 GRIDLOCK</span>
-            <div class="cam-dens">Density: <strong style="color:#f87171">88%</strong> · 35 vehicles · Trigger FIRED</div>
-            <div class="cam-bar"><div class="cam-fill" style="width:88%;background:linear-gradient(90deg,#ef4444,#dc2626);"></div></div>
+            <span class="cam-stat {_c07[2]}">{_c07[1]}</span>
+            <div class="cam-dens">{_c07[3]}</div>
+            <div class="cam-bar"><div class="cam-fill" style="{_c07[4]}"></div></div>
           </div>
-          <div class="cam-card cam-amber">
-            <div class="cam-id">CAM-12 · SILK BOARD JN</div>
+          <div class="cam-card {_c12[0]}">
+            <div class="cam-id">CAM-12 &middot; SILK BOARD JN</div>
             <div class="cam-loc">Silk Board Junction</div>
-            <span class="cam-stat amber">🟡 MODERATE</span>
-            <div class="cam-dens">Density: <strong style="color:#fbbf24">61%</strong> · 22 vehicles · CASCADE RISK</div>
-            <div class="cam-bar"><div class="cam-fill" style="width:61%;background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div>
+            <span class="cam-stat {_c12[2]}">{_c12[1]}</span>
+            <div class="cam-dens">{_c12[3]}</div>
+            <div class="cam-bar"><div class="cam-fill" style="{_c12[4]}"></div></div>
           </div>
           <div class="cam-card cam-green">
-            <div class="cam-id">CAM-23 · MG ROAD</div>
+            <div class="cam-id">CAM-23 &middot; MG ROAD</div>
             <div class="cam-loc">MG Road Corridor</div>
             <span class="cam-stat green">🟢 NORMAL</span>
-            <div class="cam-dens">Density: <strong style="color:#4ade80">28%</strong> · 9 vehicles · Clear</div>
+            <div class="cam-dens">Density: <strong style="color:#4ade80">28%</strong> &middot; 9 vehicles &middot; Clear</div>
             <div class="cam-bar"><div class="cam-fill" style="width:28%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div>
           </div>
           <div class="cam-card cam-green">
-            <div class="cam-id">CAM-31 · KORAMANGALA</div>
+            <div class="cam-id">CAM-31 &middot; KORAMANGALA</div>
             <div class="cam-loc">Koramangala 1st Block</div>
             <span class="cam-stat green">🟢 NORMAL</span>
-            <div class="cam-dens">Density: <strong style="color:#4ade80">15%</strong> · 5 vehicles · Clear</div>
+            <div class="cam-dens">Density: <strong style="color:#4ade80">15%</strong> &middot; 5 vehicles &middot; Clear</div>
             <div class="cam-bar"><div class="cam-fill" style="width:15%;background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div>
           </div>
         </div>
-        """, unsafe_allow_html=True)
+        ''', unsafe_allow_html=True)
 
         st.markdown('<div class="sec-h" style="margin-top:14px;">CAM-07 · ANNOTATED LIVE FEED</div>', unsafe_allow_html=True)
 
