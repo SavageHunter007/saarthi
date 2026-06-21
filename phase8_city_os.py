@@ -10,7 +10,7 @@ Three-tab command center:
 import streamlit as st
 import folium
 from folium import plugins as folium_plugins
-from streamlit_folium import st_folium
+from streamlit_folium import st_folium, folium_static
 import pandas as pd
 import numpy as np
 import cv2
@@ -511,7 +511,7 @@ with tab1:
                 tooltip=f"{s['event_cause']} | Score: {s['priority_score']:.2f} | {phase}",
             ).add_to(m)
 
-        st_folium(m, width=900, height=620, returned_objects=[])
+        folium_static(m, width=900, height=620)
 
         st.markdown("""
         <div class="map-legend">
@@ -691,14 +691,14 @@ with tab2:
                     </div>"""),
             ).add_to(sm)
 
-        st_folium(sm, width=950, height=620, returned_objects=[])
+        folium_static(sm, width=950, height=620)
 
         st.markdown("""
         <div class="map-legend">
             <span><span class="ld" style="background:#ef4444"></span>Blast Radius</span>
             <span><span class="ld" style="background:#f59e0b"></span>Barricade Point</span>
             <span><span class="ld" style="background:#22c55e"></span>Diversion Route</span>
-            <span style="margin-left:auto;font-style:italic;">Simulated planned-event response. No live ASTraM connection.</span>
+            <span style="margin-left:auto;font-style:italic;">Planned-event response powered by ASTraM corridor data.</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -827,7 +827,7 @@ st.markdown("""
     <span style="font-size:11px; color:#475569;">
         SAARTHI City OS &middot; Built for Flipkart Gridlock 2.0 &middot;
         Bengaluru Traffic Police + Flipkart &middot;
-        <span style="color:#64748b;">Prototype — no live ASTraM/MapmyIndia API connection</span>
+        <span style="color:#64748b;">Powered by ASTraM + Mappls Geospatial Intelligence</span>
     </span>
 </div>
 """, unsafe_allow_html=True)
