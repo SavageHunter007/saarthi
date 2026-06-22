@@ -1010,7 +1010,7 @@ with tab3:
         if active:
             st.markdown("""
             <div class="edge-card">
-              <div class="edge-title">🚗 VEHICLE CLASSIFICATION — CAM-07 PEAK DETECTED</div>
+              <div class="edge-title">🚗 PEAK VEHICLE COUNTS (TRIGGER EVENT)</div>
               <div class="veh-grid">
                 <div class="veh-item"><div class="veh-icon">🚗</div><div class="veh-count">21</div><div class="veh-lbl">Cars</div></div>
                 <div class="veh-item"><div class="veh-icon">🚌</div><div class="veh-count">3</div><div class="veh-lbl">Buses</div></div>
@@ -1037,10 +1037,10 @@ with tab3:
         if active:
             st.markdown("""
             <div class="edge-card">
-              <div class="edge-title">📊 TRAFFIC DENSITY — CAM-07 · LIVE</div>
+              <div class="edge-title">📊 PEAK TRAFFIC DENSITY (TRIGGER EVENT)</div>
               <div style="text-align:center; padding: 6px 0;">
                 <div style="font-size:44px;font-weight:800;color:#ef4444;font-family:'JetBrains Mono',monospace;line-height:1;">88%</div>
-                <div style="font-size:11px;color:#f87171;margin-top:4px;">🔴 GRIDLOCK — Autonomous trigger fired at T+9.2s</div>
+                <div style="font-size:11px;color:#f87171;margin-top:4px;">🔴 GRIDLOCK — Snapshot at autonomous trigger (T+9.2s)</div>
               </div>
               <div class="thresh-wrap">
                 <div class="thresh-lbl"><span>0%</span><span style="color:#22c55e;">NORMAL</span><span style="color:#f59e0b;">AMBER</span><span style="color:#ef4444;">RED</span><span>100%</span></div>
